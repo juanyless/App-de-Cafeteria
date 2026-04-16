@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Control - Cafetería</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; }
+        .card { background: white; border-radius: 10px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .grid-admin { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        input { padding: 8px; border: 1px solid #ccc; border-radius: 5px; width: 90%; }
+        .controles { margin-top: 15px; display: flex; gap: 10px; }
+        button { padding: 10px; border: none; border-radius: 5px; cursor: pointer; color: white; font-weight: bold; flex-grow: 1; }
+        .btn-update { background: #2980b9; }
+        .btn-off { background: #dc3545; }
+        .btn-on { background: #28a745; }
+        .img-preview { width: 50px; height: 50px; border-radius: 5px; object-fit: cover; }
+    </style>
+</head>
+<body>
+    <h1>⚙️ Gestión de Productos</h1>
+    <div id="lista-admin">Cargando...</div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+        const firebaseConfig = { 
+            apiKey: "AIzaSyCnaxLj7YdWuAV--PgAr4sqt3RdGEpd3HU",
+            authDomain: "cafeteria-saas.firebaseapp.com",
+            databaseURL: "https://cafeteria-saas-default-rtdb.firebaseio.com",
+            projectId: "cafeteria-saas",
+            storageBucket: "cafeteria-saas.firebasestorage.app",
+            messagingSenderId: "731038619439",
+            appId: "1:731038619439:web:f794b7dfb56a8ef0ad73da"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        db.ref('productos').on('value', (snapshot) => {
+            const productos = snapshot.val();
+            const contenedor = document.getElementById('lista-admin');
+            contenedor.innerHTML = "";
+
+            for (let id in productos) {
+                const p = productos[id];
+                const card = document.createElement('div');
+                card.className = "card";
+                card.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <img src="${p.imagen}" class="img-preview">
+                        <h2 style="margin:0;">${p.nombre || 'Sin nombre'}</h2>
+                    </div>
+                    <div class="grid-admin">
+                        <input type="text" id="n-${id}" value="${p.nombre || ''}" placeholder="Nombre">
+                        <input type="number" id="p-${id}" value="${p.precio || 0}" placeholder="Precio">
+                        <input type="text" id="d-${id}" value="${p.descripcion || ''}" placeholder="Descripción">
+                        <input type="text" id="i-${id}" value="${p.imagen || ''}" placeholder="URL Imagen">
+                    </div>
+                    <div class="controles">
+                        <button class="btn-update" onclick="actualizar('${id}')">Guardar Cambios</button>
+                        <button class="${p.disponible ? 'btn-off' : 'btn-on'}" onclick="alternar('${id}', ${p.disponible})">
+                            ${p.disponible ? 'Poner Agotado' : 'Activar'}
+                        </button>
+                    </div>
+                `;
+                contenedor.appendChild(card);
+            }
+        });
+        function actualizar(id) {
+    const nombreInput = document.getElementById(`n-${id}`).value;
+    const precioInput = document.getElementById(`p-${id}`).value;
+    const descInput = document.getElementById(`d-${id}`).value;
+    const imgInput = document.getElementById(`i-${id}`).value;
+
+    // Creamos el objeto de actualización
+    const updates = {
+        nombre: nombreInput || "Producto sin nombre",
+        precio: Number(precioInput) || 0,
+        descripcion: descInput || "",
+        imagen: imgInput || "https://via.placeholder.com/150" // Imagen por defecto si está vacío
+    };
+
+    db.ref(`productos/${id}`).update(updates)
+        .then(() => {
+            alert("✅ ¡Cambios guardados correctamente!");
+        })
+        .catch((error) => {
+            console.error("Error al guardar:", error);
+            alert("❌ No se pudo guardar el cambio.");
+        });
+}
+    </script>
+</body>
+</html>

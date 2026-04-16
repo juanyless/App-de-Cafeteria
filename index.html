@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>☕ Café Express - Menú</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f8f9fa; color: #333; }
+        header { background: #6f4e37; color: white; padding: 30px 20px; text-align: center; }
+        .menu-container { padding: 20px; max-width: 600px; margin: 0 auto; }
+        .producto { background: white; border-radius: 24px; padding: 15px; margin-bottom: 20px; display: flex; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .producto img { width: 100px; height: 100px; border-radius: 18px; object-fit: cover; margin-right: 15px; }
+        .info-container { flex-grow: 1; }
+        .info-container h3 { margin: 0; font-size: 1.15em; }
+        .precio-badge { color: #27ae60; font-weight: bold; font-size: 1.1em; margin-top: 5px; }
+        button { background: #6f4e37; color: white; border: none; padding: 12px 18px; border-radius: 15px; cursor: pointer; font-weight: bold; }
+        button:active { transform: scale(0.95); }
+        .agotado { opacity: 0.6; pointer-events: none; }
+    </style>
+</head>
+<body>
+    <header><h1>☕ Café Express</h1></header>
+    <div class="menu-container" id="menu"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+        const firebaseConfig = { 
+            apiKey: "AIzaSyCnaxLj7YdWuAV--PgAr4sqt3RdGEpd3HU",
+            authDomain: "cafeteria-saas.firebaseapp.com",
+            databaseURL: "https://cafeteria-saas-default-rtdb.firebaseio.com",
+            projectId: "cafeteria-saas",
+            storageBucket: "cafeteria-saas.firebasestorage.app",
+            messagingSenderId: "731038619439",
+            appId: "1:731038619439:web:f794b7dfb56a8ef0ad73da"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        db.ref('productos').on('value', (snapshot) => {
+            const productos = snapshot.val();
+            const contenedor = document.getElementById('menu');
+            contenedor.innerHTML = "";
+            if (!productos) return;
+
+            for (let id in productos) {
+                const p = productos[id];
+                const div = document.createElement('div');
+                div.className = `producto ${p.disponible ? '' : 'agotado'}`;
+                div.innerHTML = `
+                    <img src="${p.imagen || 'https://via.placeholder.com/150'}">
+                    <div class="info-container">
+                        <h3>${p.nombre || 'Sin nombre'}</h3>
+                        <p>${p.descripcion || 'Sin descripción'}</p>
+                        <div class="precio-badge">$${p.precio || 0}</div>
+                    </div>
+                    <button ${p.disponible ? '' : 'disabled'} onclick="enviarPedido('${p.nombre}', ${p.precio})">
+                        ${p.disponible ? 'Pedir' : 'Sin stock'}
+                    </button>
+                `;
+                contenedor.appendChild(div);
+            }
+        });
+        function enviarPedido(nombreProducto, precioProducto) {
+    // Generamos una referencia nueva para tener el ID antes de guardar
+  
+  const nuevoPedidoRef = db.ref('pedidos').push();
+    
+    nuevoPedidoRef.set({
+        nombre: nombreProducto,
+        monto: precioProducto,
+        estado: "pendiente",
+        timestamp: firebase.database.ServerValue.TIMESTAMP // Usa el tiempo del servidor, es mejor
+    })
+    .then(() => alert("✅ ¡Pedido enviado a cocina!"))
+    .catch((error) => console.error("Error al enviar:", error));
+}
+    </script>
+</body>
+</html>

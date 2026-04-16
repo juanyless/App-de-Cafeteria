@@ -1,0 +1,21 @@
+{
+  "productos": {
+    "c1": {
+      "nombre": "Café Solo",
+      "precio": 1500,
+      "disponible": true
+    },
+    "c2": {
+      "nombre": "Café con Leche",
+      "precio": 2200,
+      "disponible": true
+    }
+  },
+  "pedidos": {
+    "ejemplo": {
+      "item": "Café de Bienvenida",
+      "total": 0,
+      "estado": "completado"
+    }
+  }
+}

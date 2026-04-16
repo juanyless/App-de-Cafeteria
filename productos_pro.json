@@ -1,0 +1,16 @@
+{
+  "c1": {
+    "nombre": "Café Solo",
+    "precio": 1500,
+    "disponible": true,
+    "descripcion": "Café negro intenso, tostado natural.",
+    "imagen": "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=500"
+  },
+  "c2": {
+    "nombre": "Café con Leche",
+    "precio": 2200,
+    "disponible": true,
+    "descripcion": "Equilibrio perfecto entre café y leche cremosa.",
+    "imagen": "https://images.unsplash.com/photo-1541167760496-162955ed8a9f?w=500"
+  }
+}
