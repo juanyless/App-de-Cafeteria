@@ -45,7 +45,7 @@ db.ref('pedidos').on('value', (snapshot) => {
     if (!snapshot.exists()) {
         console.log("No hay pedidos en la base de datos");
         return;
-    }
+    }mmmmmmmmm
 
     snapshot.forEach((childSnapshot) => {
         const id = childSnapshot.key;
